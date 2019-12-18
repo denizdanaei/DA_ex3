@@ -1,31 +1,19 @@
-import java.net.MalformedURLException;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.io.Serializable;
 
-
-public class Link {
+public class Link implements Serializable {
 
     int weight;
-    Node node1,node2;
-    public Link (int weigth, Node node1, Node node2) {
+    NodeInterface node1,node2;
+
+    public Link (int weigth, NodeInterface node1, NodeInterface node2) {
         this.weight = weigth;
         this.node1 = node1;
         this.node2 = node2;
-        System.out.println ("Link between node"+node1.id+" and node"+node2.id+" with weight="+weigth);
     }
 
-    public int whoisNeighbour (Node node) {
-        if(node.id==node1.id) return node2.id;
-        else return node1.id;
-    }
-
-
-
+    // JUR: Can't be used when remote
+    // public int whoisNeighbour (NodeInterface node) {
+    //     if(node.id==node1.id) return node2.id;
+    //     else return node1.id;
+    // }
 }
