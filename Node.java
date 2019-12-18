@@ -21,9 +21,10 @@ public class Node {
         System.out.println("node " + id);
     }
 
-    public void addlink(Link link){
-        links.add(link);
-        int myneighbour=link.whoisNeighbour(this);
-        System.out.println("node "+id+"neighbour "+myneighbour);
+    // public void addlink(Link link){
+    //     links.add(link);
+    //     int myneighbour=link.whoisNeighbour(this);
+    //     System.out.println("node "+id+"neighbour "+myneighbour);
+    // }
+
     }
-}

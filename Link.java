@@ -18,8 +18,9 @@ public class Link {
         this.weight = weigth;
         this.node1 = node1;
         this.node2 = node2;
-        node1.addlink(this);
-        node2.addlink(this);
+        node1.links.add(this);
+        node2.links.add(this);
+        System.out.println("Link between node"+node1.id+" and node"+node2.id+" with weight="+weigth);
     }
 
     public List getNodes() {
