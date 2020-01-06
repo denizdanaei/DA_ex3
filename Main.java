@@ -10,9 +10,10 @@ public class Main{
     public static Registry rmireg;
     
     public static void main (String[] args){
-        int mat[][] = { { 0, 2, 3}, 
-                        { 2, 0, 1}, 
-                        { 3, 1, 0}};
+        int mat[][] = { { 0, 2, 3, 0}, 
+                        { 2, 0, 1, 0}, 
+                        { 3, 1, 0, 4},
+                        { 0, 0, 4, 0}};
 
         createGraph(mat);  
     }
@@ -28,18 +29,13 @@ public class Main{
         } catch (Exception e) {
             System.out.println("Exception @creatingRegistry");
         }
-
         // Create Nodes and register them to RMI registry
         for (int i = 0; i < mat.length; i++){
-
             Node node = new Node(i);
-            myThreads[i] = new Thread(node);
-            myThreads[i].start();
-    
+            myThreads[i] = new Thread(node);    
             try {
                 NodeInterface nodeStub = (NodeInterface) UnicastRemoteObject.exportObject(node, 0);
                 nodes.add(nodeStub);
-
             } catch (Exception e) {
                 System.out.println("Exception @createGraph");
             }
@@ -51,6 +47,11 @@ public class Main{
                 createlinks (mat[i][j], nodes.get(i), nodes.get(j));
             }
         }
+        for (int i = 0; i < mat.length; i++){
+            
+            myThreads[i].start();
+        }
+
     }
 
     private static void createlinks (int weight, NodeInterface node1, NodeInterface node2){
