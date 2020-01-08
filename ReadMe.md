@@ -10,6 +10,8 @@
 
 - sendmsg and recievemsg LN++ -> counts twice -> becuz sent at the sametime
 - what to do with return exception public void NodeInterface dst()?
+- best_link how to change each time what it points to
+    - stuck on the 1st value
 
 # Report
 - thread.start is now happening after creating the nodes and the links.

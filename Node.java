@@ -1,4 +1,3 @@
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,20 +46,19 @@ public class Node implements NodeInterface, Runnable {
 
     public void wakeup() {
         SN = nodeState.FIND;
-        initiate();
-        sendMessage(best_link, new Message("test_edge", LN, FN));
-        
-    }
-
-    public void initiate() {
         int linkWeight = 0;
+        best_weight = Integer.MAX_VALUE;
         for (Link link : links) {
-            linkWeight = link.getWeight();
-            if (linkWeight > 0 && linkWeight < best_weight) {
-                best_link = link;
-                best_weight = link.getWeight();
-            }
+            if(link.LS == linkState.is_IN_MST){
+                linkWeight = link.getWeight();
+                if (linkWeight > 0 && linkWeight < best_weight) {
+                    best_link = link;
+                    best_weight = link.getWeight();
+                }
+            } 
         }
+        System.out.println(best_link);          
+        sendMessage(best_link, new Message("test_edge", LN, FN));
     }
 
     public void sendMessage(Link link,  Message message) {
@@ -69,11 +67,9 @@ public class Node implements NodeInterface, Runnable {
             if((link.dst(id)).onRecieve(link, message)){
                 SN = nodeState.FOUND;
                 FN=link.getWeight();
-                LN+=1;
-                System.out.println(message);                    
-                System.out.println(this);
-                }
-            
+                // System.out.println(message);                    
+                // System.out.println(this);    
+            }
         } catch (Exception e) {
             System.out.println("@onSend");
         }
@@ -81,41 +77,26 @@ public class Node implements NodeInterface, Runnable {
 
     public boolean onRecieve(Link link, Message message) {
         try {
-            // System.out.println(id + " recieves msg");
-            
-                if (link.getWeight()==best_weight && SN != nodeState.FOUND) {    
-                    SN = nodeState.FOUND;
-                    FN=link.getWeight();
-                    LN+=1;
-                    
-                    System.out.println(this);
-                    return true;
+            if (link.getWeight() == best_weight && SN == nodeState.FIND) {    
+                SN = nodeState.FOUND;
+                link.setLS(linkState.IN_MST);
+                
+                if(message.LN>LN)
+                    LN = message.LN; //absorb
+                else
+                    LN++;           // merge
+                FN=link.getWeight();                    
+                System.out.println(this); 
+                return true;
                 }
-             else{
+            else{
                 return false;
                 }
         } catch (Exception e) {
                 System.out.println("@exceptiongetID");
                 return false;
             }
-        // System.out.println(message);
     }
-/*
-    public void accept(){
-        change states of link and nodes
-        FN,SN,LN, ...
-        report(accepted)
-
-    }
-
-    public void reject(){
-        report(rejected)
-    }
-    
-    public report(){
-        report back u aceepted/rejected for later changes in the 1st sender node
-    }
-*/
     public String toString() {
         String string = "node" + id + " LN=" + LN + " SN=" + SN + " FN=" + FN;
         return string;
