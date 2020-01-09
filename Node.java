@@ -46,24 +46,21 @@ public class Node implements NodeInterface, Runnable {
     }
 
     public void wakeup() {
-        int tempweight = 1;
         nodeState = NodeState.FIND;
-        best_weight = Integer.MAX_VALUE;
+        
         for (Link link : links) {
-            if(link.linkState == LinkState.is_IN_MST){
+            if(link.linkState == LinkState.UNKOWN){     
                 if (link.getWeight() < best_weight) {
                     best_link = link;
                     best_weight = link.getWeight();
                 }
             } 
         }
-        System.out.println("node " + id + " best link " + best_weight);
-                     
+        System.out.println("node " + id + " best link " + best_weight);                 
     }
 
     public void sendMessage(Link link,  Message message) {
         try {
-            // SN = nodeState.FIND;    
             if((link.dst(id)).onRecieve(link, message)){
                 nodeState = NodeState.FOUND;
                 fragmentName=link.getWeight();

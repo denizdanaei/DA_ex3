@@ -43,7 +43,9 @@ public class Main{
         // Create links
         for (int i = 0; i < mat.length; i++){
             for (int j = i+1; j < mat.length; j++){
+                if ( mat[i][j] != 0)
                 createlinks (mat[i][j], nodes.get(i), nodes.get(j));
+                
             }
         }
         for (int i = 0; i < mat.length; i++){
@@ -60,7 +62,6 @@ public class Main{
         try {
             node1.addLink(link);
             node2.addLink(link);
-
         } catch (Exception e) {
             System.out.println("Exception @createLinks");
             System.out.println(e.getMessage());

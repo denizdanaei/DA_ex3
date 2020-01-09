@@ -1,7 +1,7 @@
 import java.io.Serializable;
 
 enum LinkState {
-    is_IN_MST, IN_MST, NOT_IN_MST
+    UNKOWN, IN_MST, NOT_IN_MST
 }
 
 public class Link implements Serializable {
@@ -14,7 +14,7 @@ public class Link implements Serializable {
         this.weight = weigth;
         this.node1 = node1;
         this.node2 = node2;
-        this.linkState = LinkState.is_IN_MST;
+        this.linkState = LinkState.UNKOWN;
     }
 
     public int getWeight() {
