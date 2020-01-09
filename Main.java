@@ -50,6 +50,7 @@ public class Main{
             
             myThreads[i].start();
         }
+        // myThreads[1].start();
 
     }
 

@@ -2,14 +2,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Node implements NodeInterface, Runnable {
-    private enum nodeState {
+    private enum NodeState {
         FOUND, FIND, SLEEPING
     }
 
     public int id;
-    public nodeState SN; // state of the node(find/found)
-    public int LN; // level of the current fragment it is part of
-    public int FN; // name of the current fragment it is part of
+    public NodeState nodeState; 
+    public int fragmentLevel; 
+    public int fragmentName;
 
     public boolean test_edge; // edge checked whether other end in same fragment
     public int find_count; // number of report messages expected
@@ -22,9 +22,9 @@ public class Node implements NodeInterface, Runnable {
 
     public Node(int id) {
         this.id = id;
-        this.SN = nodeState.SLEEPING;
-        this.LN = 0;
-        this.FN = 0;
+        this.nodeState = NodeState.SLEEPING;
+        this.fragmentLevel = 0;
+        this.fragmentName = 0;
         this.test_edge=false;
     }
 
@@ -39,34 +39,34 @@ public class Node implements NodeInterface, Runnable {
     // threads stuff
     public void run() {
         // System.out.println("Node " + id + " running");
-        if (SN == nodeState.SLEEPING){
+        if (nodeState == NodeState.SLEEPING){
             wakeup();
+            sendMessage(best_link, new Message("test_edge", fragmentLevel, fragmentName));
         }
     }
 
     public void wakeup() {
-        SN = nodeState.FIND;
-        int linkWeight = 0;
+        int tempweight = 1;
+        nodeState = NodeState.FIND;
         best_weight = Integer.MAX_VALUE;
         for (Link link : links) {
-            if(link.LS == linkState.is_IN_MST){
-                linkWeight = link.getWeight();
-                if (linkWeight > 0 && linkWeight < best_weight) {
+            if(link.linkState == LinkState.is_IN_MST){
+                if (link.getWeight() < best_weight) {
                     best_link = link;
                     best_weight = link.getWeight();
                 }
             } 
         }
-        System.out.println(best_link);          
-        sendMessage(best_link, new Message("test_edge", LN, FN));
+        System.out.println("node " + id + " best link " + best_weight);
+                     
     }
 
     public void sendMessage(Link link,  Message message) {
         try {
             // SN = nodeState.FIND;    
             if((link.dst(id)).onRecieve(link, message)){
-                SN = nodeState.FOUND;
-                FN=link.getWeight();
+                nodeState = NodeState.FOUND;
+                fragmentName=link.getWeight();
                 // System.out.println(message);                    
                 // System.out.println(this);    
             }
@@ -77,16 +77,19 @@ public class Node implements NodeInterface, Runnable {
 
     public boolean onRecieve(Link link, Message message) {
         try {
-            if (link.getWeight() == best_weight && SN == nodeState.FIND) {    
-                SN = nodeState.FOUND;
-                link.setLS(linkState.IN_MST);
+            if (nodeState == NodeState.SLEEPING){
+                wakeup();
+            }
+            if (link.getWeight() == best_weight && nodeState == NodeState.FIND) {    
+                nodeState = NodeState.FOUND;
+                link.setLinkState(LinkState.IN_MST);
                 
-                if(message.LN>LN)
-                    LN = message.LN; //absorb
+                if(message.fragmentLevel>fragmentLevel)
+                    fragmentLevel = message.fragmentLevel; //absorb
                 else
-                    LN++;           // merge
-                FN=link.getWeight();                    
-                System.out.println(this); 
+                    fragmentLevel++;           // merge
+                fragmentName=link.getWeight();                    
+                // System.out.println(this); 
                 return true;
                 }
             else{
@@ -98,7 +101,7 @@ public class Node implements NodeInterface, Runnable {
             }
     }
     public String toString() {
-        String string = "node" + id + " LN=" + LN + " SN=" + SN + " FN=" + FN;
+        String string =  id + " " + nodeState + " fragmentLevel=" + fragmentLevel + " fragmentName=" + fragmentName;
         return string;
     }
 }

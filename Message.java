@@ -3,14 +3,15 @@ import java.io.Serializable;
 public class Message implements Serializable {
 
     String string;
-    int FN,LN;
-    public Message(String string, int LN, int FN) {
+    int fragmentLevel;
+    int fragmentName;
+    public Message(String string, int fragmentLevel, int fragmentName) {
         this.string = string;
-        this.LN = LN;
-        this.FN = FN;
+        this.fragmentLevel = fragmentLevel;
+        this.fragmentName = fragmentName;
     }
     public String toString() {
-        return string + " FN=" + FN + " LN="+LN;
+        return string + " fragmentName=" + fragmentName + " fragmentLevel=" + fragmentLevel;
     }
 //     public void initiate();
 //     public void test();
