@@ -1,31 +1,31 @@
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class Node implements NodeInterface, Runnable {
+
     private enum NodeState {
         FOUND, FIND, SLEEPING
     }
-
     public int id;
-    public NodeState nodeState; 
+    public NodeState state; 
     public int fragmentLevel; 
     public int fragmentName;
 
-    public boolean test_edge; // edge checked whether other end in same fragment
-    public int find_count; // number of report messages expected
-
     public List<Link> links = new ArrayList<Link>();
-    public Link in_branch; // edge towards core (sense of direction)
-
     public Link best_link; // local direction of candidate MOE
     public int best_weight = Integer.MAX_VALUE; // weight of current candidate MOE
 
+    // public boolean test_edge; // edge checked whether other end in same fragment
+    // public int find_count; // number of report messages expected
+
+    // public Link in_branch; // edge towards core (sense of direction)
+
     public Node(int id) {
         this.id = id;
-        this.nodeState = NodeState.SLEEPING;
+        this.state = NodeState.SLEEPING;
         this.fragmentLevel = 0;
         this.fragmentName = 0;
-        this.test_edge=false;
     }
 
     public void addLink(Link link) {
@@ -39,66 +39,105 @@ public class Node implements NodeInterface, Runnable {
     // threads stuff
     public void run() {
         // System.out.println("Node " + id + " running");
-        if (nodeState == NodeState.SLEEPING){
+        if (state == NodeState.SLEEPING){
             wakeup();
-            sendMessage(best_link, new Message("test_edge", fragmentLevel, fragmentName));
+            
         }
     }
 
     public void wakeup() {
-        nodeState = NodeState.FIND;
+        state = NodeState.FIND;
         
         for (Link link : links) {
-            if(link.linkState == LinkState.UNKOWN){     
+            if(link.state == LinkState.UNKOWN){     
                 if (link.getWeight() < best_weight) {
                     best_link = link;
                     best_weight = link.getWeight();
                 }
             } 
         }
-        System.out.println("node " + id + " best link " + best_weight);                 
+        sendMessage(best_link, new Message(Type.TEST, fragmentLevel, fragmentName));
     }
 
-    public void sendMessage(Link link,  Message message) {
+    public void sendMessage(Link link, Message message) {
         try {
-            if((link.dst(id)).onRecieve(link, message)){
-                nodeState = NodeState.FOUND;
-                fragmentName=link.getWeight();
-                // System.out.println(message);                    
-                // System.out.println(this);    
-            }
+            (link.dst(id)).onRecieve(link, message);
         } catch (Exception e) {
             System.out.println("@onSend");
+            System.exit(1);
         }
     }
 
-    public boolean onRecieve(Link link, Message message) {
-        try {
-            if (nodeState == NodeState.SLEEPING){
+    public void onRecieve(Link link, Message message) {
+            if (state == NodeState.SLEEPING){
                 wakeup();
             }
-            if (link.getWeight() == best_weight && nodeState == NodeState.FIND) {    
-                nodeState = NodeState.FOUND;
-                link.setLinkState(LinkState.IN_MST);
+            execute(link, message);
+    }
+    
+    public void execute(Link link, Message message) { 
+        switch (message.type) {
+            case TEST:
+                Test(link, message);
+                break;
+            case ACCEPT:
+                Accept(link, message);
+                break;
+        
+            case REJECT:
+                Reject(link, message);
+                break;
+            case INITIANTE:
                 
-                if(message.fragmentLevel>fragmentLevel)
-                    fragmentLevel = message.fragmentLevel; //absorb
-                else
-                    fragmentLevel++;           // merge
-                fragmentName=link.getWeight();                    
+                break;
+            case REPORT:
+                
+                break;
+            case CONNECT:
+                
+                break;
+            case ROOT_CHANGE:
+
+                break;
+            default:
+                break;
+        }
+
+
+    }
+
+    public void Test(Link link, Message message){
+        if (link.weight == best_weight && state == NodeState.FIND) {  
+            // System.out.println("from node " + id + " Accept msg sent");
+            sendMessage(link, new Message(Type.ACCEPT, fragmentLevel, fragmentName));
+        }else{
+            // System.out.println("from node " + id + " Rejecte msg sent");
+            sendMessage(link ,new Message(Type.REJECT, fragmentLevel, fragmentName));
+        }
+    }
+    public void Accept(Link link, Message message){
+        
+        //report or connect?
+    }  
+    
+    public void Reject(Link link, Message message){
+
+        //report or connect?
+    }
+
+    public void Conect(){
+                        // state = NodeState.FOUND;
+                // local.setLinkState(LinkState.IN_MST);
+                
+                // if(message.fragmentLevel>  fragmentLevel)
+                    // fragmentLevel = message.fragmentLevel; //absorb
+                // else
+                    // fragmentLevel++;           // merge
+                // fragmentName=local.getWeight();                    
                 // System.out.println(this); 
-                return true;
-                }
-            else{
-                return false;
-                }
-        } catch (Exception e) {
-                System.out.println("@exceptiongetID");
-                return false;
-            }
     }
     public String toString() {
-        String string =  id + " " + nodeState + " fragmentLevel=" + fragmentLevel + " fragmentName=" + fragmentName;
+        String string =  id + " " + state + " fragmentLevel=" + fragmentLevel + " fragmentName=" + fragmentName;
         return string;
     }
 }

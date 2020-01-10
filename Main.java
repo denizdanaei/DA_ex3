@@ -9,15 +9,11 @@ public class Main{
     public static Registry rmireg;
     
     public static void main (String[] args){
-        int mat[][] = { { 0, 1, 0, 0, 0, 0, 0, 8}, //node 0
-                        { 1, 0, 5, 0, 0, 0, 0, 0}, //node 1
-                        { 0, 5, 0, 3, 0, 0, 0, 0}, //node 2
-                        { 0, 0, 3, 0, 7, 0, 0, 0}, //node 3
-                        { 0, 0, 0, 7, 0, 2, 0, 0}, //node 4
-                        { 0, 0, 0, 0, 2, 0, 6, 0}, //node 5
-                        { 0, 0, 0, 0, 0, 6, 0, 4}, //node 6
-                        { 8, 0, 0, 0, 0, 0, 4, 0}}; //node 7
-
+ 
+        int mat[][] = { { 0, 2, 3, 0}, 
+                        { 2, 0, 1, 0}, 
+                        { 3, 1, 0, 4},
+                        { 0, 0, 4, 0}};
         createGraph(mat);  
     }
 
@@ -31,6 +27,7 @@ public class Main{
             rmireg = LocateRegistry.createRegistry(1099);
         } catch (Exception e) {
             System.out.println("Exception @creatingRegistry");
+            System.exit(1);
         }
         // Create Nodes and register them to RMI registry
         for (int i = 0; i < mat.length; i++){
@@ -41,6 +38,7 @@ public class Main{
                 nodes.add(nodeStub);
             } catch (Exception e) {
                 System.out.println("Exception @createGraph");
+                System.exit(1);
             }
         }
 
@@ -68,16 +66,23 @@ public class Main{
             node2.addLink(link);
         } catch (Exception e) {
             System.out.println("Exception @createLinks");
-            System.out.println(e.getMessage());
+            System.exit(1);
         }
     }
 
 }
 
 /**
- *         int mat[][] = { { 0, 2, 3, 0}, 
-                        { 2, 0, 1, 0}, 
-                        { 3, 1, 0, 4},
-                        { 0, 0, 4, 0}};
+ *         
+ *          
+           int mat[][] = { { 0, 1, 0, 0, 0, 0, 0, 8}, //node 0
+                        { 1, 0, 5, 0, 0, 0, 0, 0}, //node 1
+                        { 0, 5, 0, 3, 0, 0, 0, 0}, //node 2
+                        { 0, 0, 3, 0, 7, 0, 0, 0}, //node 3
+                        { 0, 0, 0, 7, 0, 2, 0, 0}, //node 4
+                        { 0, 0, 0, 0, 2, 0, 6, 0}, //node 5
+                        { 0, 0, 0, 0, 0, 6, 0, 4}, //node 6
+                        { 8, 0, 0, 0, 0, 0, 4, 0}};//node 7
+
 
  */
