@@ -78,14 +78,14 @@ public class Node implements NodeInterface, Runnable {
     public void execute(Link link, Message message) { 
         switch (message.type) {
             case TEST:
-                Test(link, message);
+                test(link, message);
                 break;
             case ACCEPT:
-                Accept(link, message);
+                accept(link, message);
                 break;
         
             case REJECT:
-                Reject(link, message);
+                reject(link, message);
                 break;
             case INITIANTE:
                 
@@ -106,7 +106,7 @@ public class Node implements NodeInterface, Runnable {
 
     }
 
-    public void Test(Link link, Message message){
+    public void test(Link link, Message message){
         if (link.weight == best_weight && state == NodeState.FIND) {  
             // System.out.println("from node " + id + " Accept msg sent");
             sendMessage(link, new Message(Type.ACCEPT, fragmentLevel, fragmentName));
@@ -115,17 +115,17 @@ public class Node implements NodeInterface, Runnable {
             sendMessage(link ,new Message(Type.REJECT, fragmentLevel, fragmentName));
         }
     }
-    public void Accept(Link link, Message message){
+    public void accept(Link link, Message message){
         
         //report or connect?
     }  
     
-    public void Reject(Link link, Message message){
+    public void reject(Link link, Message message){
 
         //report or connect?
     }
 
-    public void Conect(){
+    public void conect(){
                         // state = NodeState.FOUND;
                 // local.setLinkState(LinkState.IN_MST);
                 
