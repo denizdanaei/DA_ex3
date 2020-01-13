@@ -8,12 +8,14 @@ public class Link implements Serializable {
 
     int weight;
     NodeInterface node1, node2;
+    boolean core;
     LinkState state;
 
     public Link(int weigth, NodeInterface node1, NodeInterface node2) {
         this.weight = weigth;
         this.node1 = node1;
         this.node2 = node2;
+        this.core = false;
         this.state = LinkState.UNKOWN;
     }
 

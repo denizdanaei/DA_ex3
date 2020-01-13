@@ -4,24 +4,24 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 import java.util.ArrayList;
 
-public class Main{
+public class Main {
 
     public static Registry rmireg;
-    
-    public static void main (String[] args){
- 
-        int mat[][] = { { 0, 2, 3, 0}, 
-                        { 2, 0, 1, 0}, 
-                        { 3, 1, 0, 4},
-                        { 0, 0, 4, 0}};
-        createGraph(mat);  
+
+    public static void main(String[] args) {
+
+        
+        int mat[][] = {{ 0, 1, 3 }, // node 0
+                       { 1, 0, 2 }, // node 1
+                       { 3, 2, 0 } }; // node 2
+        createGraph(mat);
     }
 
-    private static void createGraph (int[][] mat){
-        
-        Thread[] myThreads = new Thread [mat.length];
+    private static void createGraph(int[][] mat) {
+
+        Thread[] myThreads = new Thread[mat.length];
         List<NodeInterface> nodes = new ArrayList<NodeInterface>();
-        
+
         // Create RMI registry
         try {
             rmireg = LocateRegistry.createRegistry(1099);
@@ -30,9 +30,9 @@ public class Main{
             System.exit(1);
         }
         // Create Nodes and register them to RMI registry
-        for (int i = 0; i < mat.length; i++){
+        for (int i = 0; i < mat.length; i++) {
             Node node = new Node(i);
-            myThreads[i] = new Thread(node);    
+            myThreads[i] = new Thread(node);
             try {
                 NodeInterface nodeStub = (NodeInterface) UnicastRemoteObject.exportObject(node, 0);
                 nodes.add(nodeStub);
@@ -43,13 +43,13 @@ public class Main{
         }
 
         // Create links
-        for (int i = 0; i < mat.length; i++){
-            for (int j = i+1; j < mat.length; j++){
-                if ( mat[i][j] != 0)
-                createlinks (mat[i][j], nodes.get(i), nodes.get(j));
-                
+        for (int i = 0; i < mat.length; i++) {
+            for (int j = i + 1; j < mat.length; j++) {
+                if (mat[i][j] != 0)
+                    createlinks(mat[i][j], nodes.get(i), nodes.get(j));
             }
         }
+
         for (int i = 0; i < mat.length; i++){
             
             myThreads[i].start();
@@ -83,6 +83,28 @@ public class Main{
                         { 0, 0, 0, 0, 2, 0, 6, 0}, //node 5
                         { 0, 0, 0, 0, 0, 6, 0, 4}, //node 6
                         { 8, 0, 0, 0, 0, 0, 4, 0}};//node 7
+*
+*
+*
+            int mat[][] = { { 0, 1, 3}, //node 0
+                            {1, 0, 2} , //node 1
+                            {3, 2, 0}};  //node 2 
+*
+*
+
+        int mat[][] =  {{ 0, 2, 3, 0 },
+                        { 2, 0, 1, 0 },
+                        { 3, 1, 0, 4 },
+                        { 0, 0, 4, 0 }};                                                       
 
 
+    // test mat_1 meta data
+        try {
+            (nodes.get(0)).set_fragmentID(1);
+            (nodes.get(0)).set_fragmentLevel(1);;
+            
+        } catch (Exception e) {
+            System.out.println("Exception @set_newFragment_details");
+            System.exit(1);
+        }
  */

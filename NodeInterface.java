@@ -9,4 +9,7 @@ public interface NodeInterface extends Remote {
 
     public void addLink(Link link) throws RemoteException;
     public int getID() throws RemoteException;
+    public void set_fragmentID(int newFragmentID) throws RemoteException;
+    public void set_fragmentLevel(int newLevel) throws RemoteException;
+    
 }

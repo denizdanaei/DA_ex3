@@ -8,66 +8,66 @@ public class Message implements Serializable {
 
     Type type;
     int fragmentLevel;
-    int fragmentName;
+    int fragmentID;
     
-    public Message(Type type, int fragmentLevel, int fragmentName) {
+    public Message(Type type, int fragmentLevel, int fragmentID) {
         this.type = type;
         this.fragmentLevel = fragmentLevel;
-        this.fragmentName = fragmentName;
+        this.fragmentID = fragmentID;
     }
     
     public String toString() {
-        return type + " fragmentName=" + fragmentName + " fragmentLevel=" + fragmentLevel;
+        return type + " fragmentID=" + fragmentID + " fragmentLevel=" + fragmentLevel;
     }
 
 /**
 public class TEST extends Message implements Serializable{
 
-    public TEST(String string, int fragmentLevel, int fragmentName) {
-        super(string, fragmentLevel, fragmentName);
+    public TEST(String string, int fragmentLevel, int fragmentID) {
+        super(string, fragmentLevel, fragmentID);
     }
 }
 
 
 public class INITIANTE extends Message implements Serializable{
 
-        public INITIANTE(String string, int fragmentLevel, int fragmentName) {
-            super(string, fragmentLevel, fragmentName);
+        public INITIANTE(String string, int fragmentLevel, int fragmentID) {
+            super(string, fragmentLevel, fragmentID);
         }
 }
 
 public class ACCEPT extends Message implements Serializable{
 
-    public ACCEPT(String string, int fragmentLevel, int fragmentName) {
-        super(string, fragmentLevel, fragmentName);
+    public ACCEPT(String string, int fragmentLevel, int fragmentID) {
+        super(string, fragmentLevel, fragmentID);
     }
 }
 
 public class REJECT extends Message implements Serializable{
 
-    public REJECT(String string, int fragmentLevel, int fragmentName) {
-        super(string, fragmentLevel, fragmentName);
+    public REJECT(String string, int fragmentLevel, int fragmentID) {
+        super(string, fragmentLevel, fragmentID);
     }
 }
 
 public class REPORT extends Message implements Serializable{
 
-    public REPORT(String string, int fragmentLevel, int fragmentName) {
-        super(string, fragmentLevel, fragmentName);
+    public REPORT(String string, int fragmentLevel, int fragmentID) {
+        super(string, fragmentLevel, fragmentID);
     }
 }
 
 public class CONNECT extends Message implements Serializable{
 
-    public CONNECT(String string, int fragmentLevel, int fragmentName) {
-        super(string, fragmentLevel, fragmentName);
+    public CONNECT(String string, int fragmentLevel, int fragmentID) {
+        super(string, fragmentLevel, fragmentID);
     }
 }
 
 public class ROOT_CHANGE extends Message implements Serializable{
 
-    public ROOT_CHANGE(String string, int fragmentLevel, int fragmentName) {
-        super(string, fragmentLevel, fragmentName);
+    public ROOT_CHANGE(String string, int fragmentLevel, int fragmentID) {
+        super(string, fragmentLevel, fragmentID);
     }
 }
  */
