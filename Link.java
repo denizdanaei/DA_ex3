@@ -23,7 +23,7 @@ public class Link implements Serializable {
         return weight;
     }
 
-    public void setLinkState(LinkState linkState) {
+    public void setState(LinkState linkState) {
         this.state = linkState;
     }
 
@@ -45,7 +45,7 @@ public class Link implements Serializable {
     public String toString() {
         String string;
         try {
-            string = "link " + node1.getID() + " to " + node2.getID() + " linkState=" + state + " weight=" + weight;
+            string = "link " + node1.getID() + " to " + node2.getID() + state + " weight=" + weight; //+ node1.getID() + " to " + node2.getID() 
             return string;
         } catch (Exception e) {
             System.out.println("@link");
