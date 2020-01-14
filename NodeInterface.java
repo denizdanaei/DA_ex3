@@ -4,7 +4,7 @@ import java.rmi.RemoteException;
 public interface NodeInterface extends Remote {
     
     public void sendMessage(Link link, Message message) throws RemoteException;
-    public void onRecieve(Link link, Message message) throws RemoteException;
+    public void onRecieve(int rxLinkWeight, Message message) throws RemoteException;
 
     public int getID() throws RemoteException;
 
