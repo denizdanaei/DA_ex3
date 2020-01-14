@@ -189,10 +189,10 @@ public class Node implements NodeInterface, Runnable {
                 System.out.println("APPEND to queue");
             } else {                                      // MERGE
                 System.out.println("N"+id+" merge w/ link "+link.getWeight());
-                // this.fragmentLevel++;
-                // this.fragmentID = link.getWeight();
-                // state = NodeState.FIND;
-                // sendMessage(link, new Message( Type.INITIATE, fragmentLevel, fragmentID, NodeState.FIND, best_weight));
+                this.fragmentLevel++;
+                this.fragmentID = link.getWeight();
+                state = NodeState.FIND;
+                sendMessage(link, new Message( Type.INITIATE, fragmentLevel, fragmentID, NodeState.FIND, best_weight));
             }
         } 
             
@@ -201,7 +201,7 @@ public class Node implements NodeInterface, Runnable {
     
     public void initiate(Link _link, Message message){
     
-        System.out.println("Node " + id + " recieved initiate");
+        System.out.println("Node " + id + " recieved INITIATE");
 
         this.fragmentID = message.fragmentID;
         this.fragmentLevel = message.fragmentLevel;
@@ -210,22 +210,19 @@ public class Node implements NodeInterface, Runnable {
         this.best_link = null;
         this.best_weight = Integer.MAX_VALUE;
 
-        // System.out.println("done changes");
-        // System.out.println(this);
-
-        for (Link link : links) {
-            if(link.state == LinkState.IN_MST && link.weight != in_branch.weight){
-                // System.out.println("LinkState.IN_MST && link.weight != in_branch.weight");
-                sendMessage(link, new Message( Type.INITIATE, this.fragmentLevel, this.fragmentID, this.state, best_weight));
-                if(this.state == NodeState.FIND)
-                    this.find_count++;
-            }
-        }      
-        if(this.state == NodeState.FIND){
+        // for (Link link : links) {
+        //     if(link.state == LinkState.IN_MST && link.weight != in_branch.weight){
+        //         // System.out.println("LinkState.IN_MST && link.weight != in_branch.weight");
+        //         sendMessage(link, new Message( Type.INITIATE, this.fragmentLevel, this.fragmentID, this.state, best_weight));
+        //         if(this.state == NodeState.FIND)
+        //             this.find_count++;
+        //     }
+        // }      
+        // if(this.state == NodeState.FIND){
             
-        // System.out.println("NodeState.FIND->find_MOE");
-            find_MOE();
-        }
+        // // System.out.println("NodeState.FIND->find_MOE");
+        //     find_MOE();
+        // }
     }
     
     private void find_MOE(){
