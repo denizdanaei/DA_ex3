@@ -47,15 +47,14 @@ public class Node implements NodeInterface, Runnable {
 
     // threads stuff
     public void run() {
-        // System.out.println("Node " + id + " running");
-        if (state == NodeState.SLEEPING){
-            wakeup();
-            
-            
-        }
+        System.out.println("Node " + id + " ready");
     }
 
     public void wakeup() {
+
+        if (state != NodeState.SLEEPING) return;
+        System.out.println("Node "+id+" awake");
+
         for (Link link : links) { 
             if (link.getWeight() < best_weight) {
                 best_link = link;
@@ -63,17 +62,13 @@ public class Node implements NodeInterface, Runnable {
             }
         }
         best_link.state = LinkState.IN_MST;
-        
         state = NodeState.FOUND;
         sendMessage(best_link, new Message(Type.CONNECT, fragmentLevel, fragmentID));
-        
-        // System.out.println(this);
-        
     }
 
     public void sendMessage(Link link, Message message) {
         try {
-            System.out.println(this.id + "sends" );
+            // System.out.println(this.id + " sends ");
             (link.dst(id)).onRecieve(link, message);
         } catch (Exception e) {
             System.out.println("@onSend");
@@ -147,7 +142,7 @@ public class Node implements NodeInterface, Runnable {
 
     public void connect(Link link, Message message){
 
-        System.out.println("connect");
+        // System.out.println("connect");
         if(this.state == NodeState.FOUND){
             if(this.fragmentLevel == message.fragmentLevel){
                 this.core_Node = true;
@@ -158,8 +153,8 @@ public class Node implements NodeInterface, Runnable {
                 this.state = NodeState.FIND;
 
             }
-            System.out.println(link);                   
-            System.out.println(this); 
+            // System.out.println(link);                   
+            // System.out.println(this); 
         }
     }
     public String toString() {

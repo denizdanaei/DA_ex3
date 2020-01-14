@@ -3,10 +3,9 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 import java.util.ArrayList;
-
+import java.util.Scanner;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Scanner;
 
 public class Main {
 
@@ -14,16 +13,14 @@ public class Main {
 
     public static void main(String[] args) throws FileNotFoundException {
 
+        // Parse input args and read graph file
         if (args.length != 1) {
             System.out.println("Usage: java Main <inputFile>");
             System.exit(1);
         }
-
         int mat[][] = parseGraph(args[0]);
+        System.out.println("Running example " + args[0]);
 
-
-        Thread[] myThreads = new Thread[mat.length];
-        List<NodeInterface> nodes = new ArrayList<NodeInterface>();
 
         // Create RMI registry
         try {
@@ -34,9 +31,13 @@ public class Main {
         }
 
         // Create Nodes and register them to RMI registry
+        Thread[] myThreads = new Thread[mat.length];
+        List<NodeInterface> nodes = new ArrayList<NodeInterface>();
+        
         for (int i = 0; i < mat.length; i++) {
             Node node = new Node(i);
             myThreads[i] = new Thread(node);
+            myThreads[i].start();
             try {
                 NodeInterface nodeStub = (NodeInterface) UnicastRemoteObject.exportObject(node, 0);
                 nodes.add(nodeStub);
@@ -45,17 +46,21 @@ public class Main {
                 System.exit(1);
             }
         }
+        System.out.println();
 
         // Create links
         for (int i = 0; i < mat.length; i++) {
             for (int j = i + 1; j < mat.length; j++) {
-                if (mat[i][j] != 0)
-                    createlinks(mat[i][j], nodes.get(i), nodes.get(j));
+                if (mat[i][j] != 0) createlinks(mat[i][j], nodes.get(i), nodes.get(j));
             }
         }
 
-        for (int i = 0; i < mat.length; i++){   
-            myThreads[i].start();
+        // Wake up nodes
+        try {
+            for (NodeInterface n : nodes) n.wakeup();
+        } catch (Exception e) {
+            System.out.println("Exception @wakeup");
+            System.exit(1);
         }
     }
 
@@ -72,7 +77,6 @@ public class Main {
                 matrix[i][j] = s.nextInt();
             }
         }
-
         return matrix;
     }
 
