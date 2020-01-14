@@ -30,6 +30,11 @@ public class Node implements NodeInterface, Runnable {
         this.core_Node = false;
     }
 
+    // threads stuff
+    public void run() {
+        System.out.println("Node " + id + " ready");
+    }
+
     public void addLink(Link link) {
         this.links.add(link);
     }
@@ -46,16 +51,10 @@ public class Node implements NodeInterface, Runnable {
         this.fragmentLevel = newLevel;
     }
 
-    // threads stuff
-    public void run() {
-        // System.out.println("Node " + id + " running");
-        if (state == NodeState.SLEEPING){
-            if(id == 0)
-                wakeup(); 
-        }
-    }
-
     public void wakeup() {
+        if (state != NodeState.SLEEPING) return;
+        System.out.println("Node "+id+" awake");
+
         for (Link link : links) { 
             if (link.getWeight() < best_weight) {
                 best_link = link;
@@ -69,7 +68,7 @@ public class Node implements NodeInterface, Runnable {
 
     public void sendMessage(Link link, Message message) {
         try {
-            (link.dst(id)).onRecieve(link, message);
+            link.dst(id).onRecieve(link, message);
         } catch (Exception e) {
             System.out.println("@onSend");
             System.exit(1);
@@ -77,6 +76,7 @@ public class Node implements NodeInterface, Runnable {
     }
 
     public void onRecieve(Link link, Message message) {
+        
         if (state == NodeState.SLEEPING){
             wakeup();
         }
