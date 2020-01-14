@@ -20,8 +20,9 @@ public class Node implements NodeInterface, Runnable {
     public boolean core_Node;
     // public boolean test_edge; // edge checked whether other end in same fragment
     // public int find_count; // number of report messages expected
-
     // public Link in_branch; // edge towards core (sense of direction)
+
+    public List<Link> connectRequests;      // Pending connection requests
 
     public Node(int id) {
         this.id = id;
@@ -29,6 +30,13 @@ public class Node implements NodeInterface, Runnable {
         this.fragmentLevel = 0;
         this.fragmentID = id;
         this.core_Node = false;
+
+        this.connectRequests = new ArrayList<Link>();
+    }
+
+    // threads stuff
+    public void run() {
+        System.out.println("Node " + id + " ready");
     }
 
     public void addLink(Link link) {
@@ -45,13 +53,7 @@ public class Node implements NodeInterface, Runnable {
         this.fragmentLevel = newLevel;
     }
 
-    // threads stuff
-    public void run() {
-        System.out.println("Node " + id + " ready");
-    }
-
     public void wakeup() {
-
         if (state != NodeState.SLEEPING) return;
         System.out.println("Node "+id+" awake");
 
@@ -64,12 +66,20 @@ public class Node implements NodeInterface, Runnable {
         best_link.state = LinkState.IN_MST;
         state = NodeState.FOUND;
         sendMessage(best_link, new Message(Type.CONNECT, fragmentLevel, fragmentID));
+        connectRequests.add(best_link);
+
+        // If there's a pending Connect request from the same link, form a fragment
+        if (!connectRequests.isEmpty()) {
+            if (connectRequests.contains(best_link)) {
+                System.out.println("Node "+id+" is now CORE, w/ link " + best_link.getWeight());
+                System.out.println();
+            }
+        }
     }
 
     public void sendMessage(Link link, Message message) {
         try {
-            // System.out.println(this.id + " sends ");
-            (link.dst(id)).onRecieve(link, message);
+            link.dst(id).onRecieve(link, message);
         } catch (Exception e) {
             System.out.println("@onSend");
             System.exit(1);
@@ -77,6 +87,7 @@ public class Node implements NodeInterface, Runnable {
     }
 
     public void onRecieve(Link link, Message message) {
+        
         if (state == NodeState.SLEEPING){
             wakeup();
         }
@@ -142,7 +153,7 @@ public class Node implements NodeInterface, Runnable {
 
     public void connect(Link link, Message message){
 
-        // System.out.println("connect");
+        System.out.println("Node "+id+" received CONNECT msg from link "+link.getWeight());
         if(this.state == NodeState.FOUND){
             if(this.fragmentLevel == message.fragmentLevel){
                 this.core_Node = true;

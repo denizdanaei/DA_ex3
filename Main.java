@@ -58,6 +58,7 @@ public class Main {
         // Wake up nodes
         try {
             for (NodeInterface n : nodes) n.wakeup();
+            // nodes.get(0).wakeup();
         } catch (Exception e) {
             System.out.println("Exception @wakeup");
             System.exit(1);
@@ -95,31 +96,6 @@ public class Main {
 }
 
 /**
- *         
- *          
-           int mat[][] = { { 0, 1, 0, 0, 0, 0, 0, 8}, //node 0
-                        { 1, 0, 5, 0, 0, 0, 0, 0}, //node 1
-                        { 0, 5, 0, 3, 0, 0, 0, 0}, //node 2
-                        { 0, 0, 3, 0, 7, 0, 0, 0}, //node 3
-                        { 0, 0, 0, 7, 0, 2, 0, 0}, //node 4
-                        { 0, 0, 0, 0, 2, 0, 6, 0}, //node 5
-                        { 0, 0, 0, 0, 0, 6, 0, 4}, //node 6
-                        { 8, 0, 0, 0, 0, 0, 4, 0}};//node 7
-*
-*
-*
-            int mat[][] = { { 0, 1, 3}, //node 0
-                            {1, 0, 2} , //node 1
-                            {3, 2, 0}};  //node 2 
-*
-*
-
-        int mat[][] =  {{ 0, 2, 3, 0 },
-                        { 2, 0, 1, 0 },
-                        { 3, 1, 0, 4 },
-                        { 0, 0, 4, 0 }};                                                       
-
-
     // test mat_1 meta data
         try {
             (nodes.get(0)).set_fragmentID(1);
