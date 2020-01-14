@@ -4,20 +4,23 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 import java.util.ArrayList;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 public class Main {
 
     public static Registry rmireg;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
 
-        
-        int mat[][] = {{ 0, 1, 3 }, // node 0
-                       { 1, 0, 2 }, // node 1
-                       { 3, 2, 0 } }; // node 2
-        createGraph(mat);
-    }
+        if (args.length != 1) {
+            System.out.println("Usage: java Main <inputFile>");
+            System.exit(1);
+        }
 
-    private static void createGraph(int[][] mat) {
+        int mat[][] = parseGraph(args[0]);
+
 
         Thread[] myThreads = new Thread[mat.length];
         List<NodeInterface> nodes = new ArrayList<NodeInterface>();
@@ -29,6 +32,7 @@ public class Main {
             System.out.println("Exception @creatingRegistry");
             System.exit(1);
         }
+
         // Create Nodes and register them to RMI registry
         for (int i = 0; i < mat.length; i++) {
             Node node = new Node(i);
@@ -50,12 +54,26 @@ public class Main {
             }
         }
 
-        for (int i = 0; i < mat.length; i++){
-            
+        for (int i = 0; i < mat.length; i++){   
             myThreads[i].start();
         }
-        // myThreads[1].start();
+    }
 
+    private static int[][] parseGraph(String filename) throws FileNotFoundException {
+
+        // Find matrix dimension
+        int n = new Scanner(new File(filename)).nextLine().split(" ").length;
+        int[][] matrix = new int[n][n];
+        
+        // Parse integers into array
+        Scanner s = new Scanner(new File(filename));
+        for (int i=0; i<n; i++) {
+            for (int j=0; j<n; j++) {
+                matrix[i][j] = s.nextInt();
+            }
+        }
+
+        return matrix;
     }
 
     private static void createlinks (int weight, NodeInterface node1, NodeInterface node2){
