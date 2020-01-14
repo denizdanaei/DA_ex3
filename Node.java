@@ -50,7 +50,7 @@ public class Node implements NodeInterface, Runnable {
     public void run() {
         // System.out.println("Node " + id + " running");
         if (state == NodeState.SLEEPING){
-            if(id == 2)
+            if(id == 0)
                 wakeup(); 
         }
     }
@@ -272,7 +272,7 @@ public class Node implements NodeInterface, Runnable {
                     change_root();
                 else{
                     if(message.weight == best_weight && best_weight == Integer.MAX_VALUE ){
-                        // System.out.println(this);
+                        System.out.println("Halt");
                         System.exit(best_weight);
                     }
                 }
