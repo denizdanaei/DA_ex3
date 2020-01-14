@@ -22,7 +22,8 @@ public class Message implements Serializable {
     }
     
     public String toString() {
-        return type + " fragmentID=" + fragmentID + " fragmentLevel=" + fragmentLevel + " " + state + " weight" + weight;
+        String string = type + " fragmentID=" + fragmentID + " fragmentLevel=" + fragmentLevel + " " + state + " weight" + weight;
+        return string;
     }
 
 /**

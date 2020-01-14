@@ -43,15 +43,14 @@ public class Link implements Serializable {
     }
 
     public String toString() {
-        String string;
+        String string = "null";
         try {
             string = "link " + node1.getID() + " to " + node2.getID() + state + " weight=" + weight; //+ node1.getID() + " to " + node2.getID() 
-            return string;
         } catch (Exception e) {
             System.out.println("@link");
             System.exit(1);
         }
-        return "null";
+        return string;
     }
 
 }
