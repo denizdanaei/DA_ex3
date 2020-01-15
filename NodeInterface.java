@@ -11,6 +11,6 @@ public interface NodeInterface extends Remote {
     // Simulator stuff
     public void wakeup()                          throws RemoteException;
     public void addLink(Link link)                throws RemoteException;
-    public void set_fragmentID(int newFragmentID) throws RemoteException;
-    public void set_fragmentLevel(int newLevel)   throws RemoteException;
+//     public void set_fragmentID(int newFragmentID) throws RemoteException;
+//     public void set_fragmentLevel(int newLevel)   throws RemoteException;
 }

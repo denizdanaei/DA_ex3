@@ -46,7 +46,7 @@ public class Main {
                 System.exit(1);
             }
         }
-        System.out.println();
+        // System.out.println();
 
         // Create links
         for (int i = 0; i < mat.length; i++) {
@@ -57,12 +57,13 @@ public class Main {
 
         // Wake up nodes
         try {
-            // for (NodeInterface n : nodes) n.wakeup();
-            nodes.get(2).wakeup();
+            for (NodeInterface n : nodes) n.wakeup();
+            // nodes.get(0).wakeup();
         } catch (Exception e) {
             System.out.println("Exception @wakeup");
             System.exit(1);
         }
+        // for (NodeInterface n : nodes) System.out.print(n);
     }
 
     private static int[][] parseGraph(String filename) throws FileNotFoundException {
@@ -94,15 +95,3 @@ public class Main {
     }
 
 }
-
-/**
-    // test mat_1 meta data
-        try {
-            (nodes.get(0)).set_fragmentID(1);
-            (nodes.get(0)).set_fragmentLevel(1);;
-            
-        } catch (Exception e) {
-            System.out.println("Exception @set_newFragment_details");
-            System.exit(1);
-        }
- */
