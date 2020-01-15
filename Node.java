@@ -221,6 +221,7 @@ public class Node implements NodeInterface, Runnable {
         }             
     }
     public void sendReport(){
+        if(id == 1)  System.out.println(test_edge);
         if(find_count == 0 && test_edge == null){
             this.state = NodeState.FOUND;
             sendMessage(in_branch, new Message(Type.REPORT, fragmentLevel, fragmentID, state, best_weight));
@@ -260,18 +261,15 @@ public class Node implements NodeInterface, Runnable {
     }  
     
     public void reject(Link link, Message message){
-        
-        // if(link.state == LinkState.UNKOWN){
+        if(link.state == LinkState.UNKOWN){
         link.setState(LinkState.NOT_IN_MST);    
-        // }
+        }
         find_MOE();
     }
 
 
     public void report(Link link, Message message){
-                
         if(link.weight != in_branch.weight){
-
             if(find_count>0) find_count--;           
             if(message.weight < best_weight){
                 this.best_weight = message.weight;
