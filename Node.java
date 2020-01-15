@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 
 enum NodeState {
@@ -7,6 +9,17 @@ enum NodeState {
 }
 
 public class Node implements NodeInterface, Runnable {
+
+    private class QueueItem{
+        Message message;
+        int linkWeight;
+        QueueItem(int linkWeight, Message message){
+            this.linkWeight = linkWeight;
+            this.message = message;
+        }
+    }
+    private Queue<QueueItem> queue;
+
     public int id;
     public NodeState state;
      
@@ -28,9 +41,10 @@ public class Node implements NodeInterface, Runnable {
         this.fragmentLevel = 0;
         this.fragmentID = -1;
         this.core_Node = false;
+        this.queue = new LinkedList<QueueItem>();
     }
 
-    // threads stuff
+        // threads stuff
     public void run() {
         // System.out.println("Node " + id + " ready");
     }
@@ -41,6 +55,19 @@ public class Node implements NodeInterface, Runnable {
 
     public int getID() {
         return id;
+    }
+
+    private void check_queue(){
+    	
+    	for (int i = 0; i < queue.size(); i++)
+    	{
+    		if (queue.size() != 0)
+    		{
+                // System.out.println("N" + id + " checks queue");
+                QueueItem obj = queue.remove();
+                execute(weightToLink(obj.linkWeight), obj.message);
+    		}
+    	}
     }
 
     public Link weightToLink(int weight) {
@@ -74,12 +101,14 @@ public class Node implements NodeInterface, Runnable {
             System.out.println("@onSend from " + id);
             System.exit(1);
         }
+
     }
 
     public void onRecieve(int rxLinkWeight, Message message) {
         
         if (state == NodeState.SLEEPING) wakeup();
         execute(weightToLink(rxLinkWeight), message);
+        check_queue();
     }
     
     public void execute(Link link, Message message) { 
@@ -121,6 +150,7 @@ public class Node implements NodeInterface, Runnable {
 
         if (message.fragmentLevel < this.fragmentLevel) {       // ABSORB
             System.out.println("Fragment "+ fragmentID +" absorb fragment " + message.fragmentID);
+            // System.out.println("Fragment"+ fragmentID +" absorb w/ link "+ link.getWeight() + " to fragment" + message.fragmentID);
             link.setState(LinkState.IN_MST);
             sendMessage(link, new Message(Type.INITIATE, fragmentLevel, fragmentID, state, best_weight));
             if (this.state == NodeState.FIND) find_count++;
@@ -128,9 +158,9 @@ public class Node implements NodeInterface, Runnable {
         } else {
             if (link.state == LinkState.UNKOWN) {         // ENQUEUE
                 System.out.println("APPEND to queue");
-
+                queue.add(new QueueItem(link.getWeight(), message));
             } else {                                      // MERGE
-                System.out.println("Fragment "+ fragmentID +" merge w/ fragment " + message.fragmentID);
+                // System.out.println("Fragment"+ fragmentID +" merge w/ link "+ link.getWeight() + " to fragment" + message.fragmentID);
                 this.fragmentLevel++;
                 this.fragmentID = link.getWeight();
                 // state = NodeState.FIND;
@@ -195,8 +225,9 @@ public class Node implements NodeInterface, Runnable {
     public void test(Link link, Message message){
         // System.out.println("N" + id + " recieves TEST");
         if(this.fragmentLevel < message.fragmentLevel){
-            //add to queue
-            System.out.println("fragmentLevel < message.fragmentLevel");
+            System.out.println("APPEND to queue");
+            queue.add(new QueueItem(link.getWeight(), message));
+
         }else{
             if(message.fragmentID != this.fragmentID){
                 sendMessage(link, new Message(Type.ACCEPT, this.fragmentLevel, this.fragmentID, this.state, best_weight));
@@ -251,8 +282,8 @@ public class Node implements NodeInterface, Runnable {
             }
         }else{  
             if(this.state == NodeState.FIND){
-                find_MOE();
-                //put to queue
+                System.out.println("APPEND to queue");
+                queue.add(new QueueItem(link.getWeight(), message));
             }
             else{
                 System.out.println("Halt");
