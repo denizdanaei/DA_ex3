@@ -119,10 +119,8 @@ public class Node implements NodeInterface, Runnable {
 
     public void connect(Link link, Message message){
 
-        // System.out.println("N"+id+" received CONNECT from link " + link.getWeight());
-
         if (message.fragmentLevel < this.fragmentLevel) {       // ABSORB
-            System.out.println("Fragment"+ fragmentID +" merge w/ link "+ link.getWeight() + " to fragment" + message.fragmentID);
+            System.out.println("Fragment "+ fragmentID +" absorb fragment " + message.fragmentID);
             link.setState(LinkState.IN_MST);
             sendMessage(link, new Message(Type.INITIATE, fragmentLevel, fragmentID, state, best_weight));
             if (this.state == NodeState.FIND) find_count++;
@@ -130,8 +128,9 @@ public class Node implements NodeInterface, Runnable {
         } else {
             if (link.state == LinkState.UNKOWN) {         // ENQUEUE
                 System.out.println("APPEND to queue");
+
             } else {                                      // MERGE
-                System.out.println("Fragment"+ fragmentID +" absorb w/ link "+ link.getWeight() + " to fragment" + message.fragmentID);
+                System.out.println("Fragment "+ fragmentID +" merge w/ fragment " + message.fragmentID);
                 this.fragmentLevel++;
                 this.fragmentID = link.getWeight();
                 // state = NodeState.FIND;
@@ -140,9 +139,7 @@ public class Node implements NodeInterface, Runnable {
         
                 sendMessage(link, new Message( Type.INITIATE, fragmentLevel, fragmentID, NodeState.FIND, best_weight));
             }
-        } 
-            
-        
+        }
     }
     
     public void initiate(Link link, Message message){
