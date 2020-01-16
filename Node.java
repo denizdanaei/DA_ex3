@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 
 enum NodeState {
@@ -54,11 +55,18 @@ public class Node implements NodeInterface, Runnable {
 
         while(true) {
             try {
-                QueueItem rx = rxQueue.take();
+                QueueItem rx = rxQueue.poll(5, TimeUnit.SECONDS);
+                
+                if (rx==null) {
+                    System.out.println(this);
+                    continue;
+                }
                 onMessage(weightToLink(rx.linkWeight), rx.message);
-            
+                
             } catch (Exception e) {
                 System.out.println("N"+id+" exception at rxQueue.take()\n"+e);
+                e.printStackTrace();
+                System.exit(1);
             }
         }
     }
@@ -77,7 +85,7 @@ public class Node implements NodeInterface, Runnable {
 
     private void check_queue(){
     	if (queue.size() != 0){
-            // System.out.println("N" + id + " queue size=" + queue.size() );
+            // System.out.println(" queue size=" + queue.size());
     	    for (int i = 0; i < queue.size(); i++){
                 QueueItem obj = queue.remove();
                 execute(weightToLink(obj.linkWeight), obj.message);
@@ -126,16 +134,17 @@ public class Node implements NodeInterface, Runnable {
         } catch (Exception e) {
             System.out.println("N"+id+" exception at onReceive");
             System.out.println(e);
+            System.exit(1);
         }
     }
 
     private void onMessage(Link link, Message message) {
         if (state == NodeState.SLEEPING) wakeup();
         execute(link, message);
-        check_queue();
+        // check_queue();
     }
     
-    public void execute(Link link, Message message) { 
+    public void execute(Link link, Message message) {
         switch (message.type) {
             case TEST:
                 test(link, message);
@@ -172,7 +181,7 @@ public class Node implements NodeInterface, Runnable {
 
     public void connect(Link link, Message message) {
 
-        // System.out.println("N" + id  +" recieved CONNECT at link "+ link.getWeight());
+        // System.out.println("N" + id  +" recieved CONNECT at link " + link.getWeight());
 
         // ABSORB
         if (message.fragmentLevel < this.fragmentLevel) {
@@ -190,9 +199,9 @@ public class Node implements NodeInterface, Runnable {
             this.fragmentID = link.getWeight();
             this.state = NodeState.FIND;        // Why was this commented out?
             this.in_branch = link;
-            
-            // System.out.println("N" + id + " fragmentLevel= " + fragmentLevel + " fragmentID= " + fragmentID);
             sendMessage(link, new Message( Type.INITIATE, fragmentLevel, fragmentID, NodeState.FIND, best_weight));
+            check_queue();
+
         }
     }
     
@@ -206,8 +215,8 @@ public class Node implements NodeInterface, Runnable {
         this.in_branch = link;
         this.best_link = null;
         this.best_weight = Integer.MAX_VALUE;
-        // System.out.println("N" + id + " fragmentLevel= " + fragmentLevel + " fragmentID= " + fragmentID);
-        // check_queue();
+        
+        check_queue();
         for (Link l : links) {
             if(l.state == LinkState.IN_MST && l.weight != in_branch.weight){
                 if(this.state == NodeState.FIND)  this.find_count++;
@@ -233,10 +242,7 @@ public class Node implements NodeInterface, Runnable {
             }
         }
         if(flag){
-            // System.out.println(test_edge);
-            Message m = new Message(Type.TEST, fragmentLevel, fragmentID, state, best_weight);
-            // System.out.println(m);
-            sendMessage(this.test_edge, m);
+            sendMessage(this.test_edge, new Message(Type.TEST, fragmentLevel, fragmentID, state, best_weight));
                     
         }else{
             test_edge = null;
@@ -244,9 +250,11 @@ public class Node implements NodeInterface, Runnable {
         }             
     }
     public void sendReport() {
+        // System.out.println("N"+id+" find_count="+find_count);
 
         if (find_count == 0 && test_edge == null) {
             this.state = NodeState.FOUND;
+            check_queue();
             sendMessage(in_branch, new Message(Type.REPORT, fragmentLevel, fragmentID, state, best_weight));
         }
     }
@@ -257,13 +265,13 @@ public class Node implements NodeInterface, Runnable {
         
         if (this.fragmentLevel < message.fragmentLevel) {
             queue.add(new QueueItem(link.getWeight(), message));
-
         } else if (message.fragmentID != this.fragmentID) {
             sendMessage(link, new Message(Type.ACCEPT, this.fragmentLevel, this.fragmentID, this.state, best_weight));
         } else {
             if (link.state == LinkState.UNKOWN) {
                 link.setState(LinkState.NOT_IN_MST);
                 sendMessage(link, new Message(Type.REJECT, this.fragmentLevel, this.fragmentID, this.state, best_weight));
+                check_queue();
             } else {
                 // if(test_edge.weight !=link.weight) {
                 // System.out.println(test_edge);
@@ -273,9 +281,8 @@ public class Node implements NodeInterface, Runnable {
     }    
     
     public void accept(Link link, Message message){
-        
         this.test_edge = null;
-        if(link.weight < this.best_weight){
+        if(link.weight <= best_weight){
             best_link = link;
             best_weight = link.getWeight();
         }
@@ -284,15 +291,14 @@ public class Node implements NodeInterface, Runnable {
     
     public void reject(Link link, Message message){
         if(link.state == LinkState.UNKOWN){
-        link.setState(LinkState.NOT_IN_MST);    
+        link.setState(LinkState.NOT_IN_MST);
+        check_queue();    
         }
         find_MOE();
     }
 
     public void report(Link link, Message message){
-        // System.out.println(this);
-        // System.out.println(message);
-        if(link.weight != in_branch.weight){
+            if(link.weight != in_branch.weight){
             if(find_count>0) find_count--;           
             if(message.weight < best_weight){
                 this.best_weight = message.weight;
@@ -300,30 +306,28 @@ public class Node implements NodeInterface, Runnable {
             }
             sendReport();
         }else if(this.state == NodeState.FIND){
-            
-            // System.out.println("N" + id + " queued " + message.type + " w/ link" +  link.getWeight());
-            // System.out.println("N" + id + " REPORT msg queued");
             queue.add(new QueueItem(link.getWeight(), message)); 
         }else{
-            if(message.weight > best_weight) change_root();
-            else if(message.weight == Integer.MAX_VALUE && best_weight == Integer.MAX_VALUE ){
+            if(message.weight == Integer.MAX_VALUE && best_weight == Integer.MAX_VALUE ){
                     System.out.println("Halt");                        
                     System.exit(1);
-            }
+            }else if(message.weight > best_weight) change_root();
         }
     }
 
     private void change_root(){
+
+        // System.out.println("N"+id+" changing root");
         if(best_link.state == LinkState.IN_MST) sendMessage(best_link, new Message(Type.ROOT_CHANGE, fragmentLevel, fragmentID, state, best_weight));
         else{
             best_link.setState(LinkState.IN_MST);
-            sendMessage(best_link, new Message(Type.CONNECT, fragmentLevel, fragmentID, state, best_weight));
+            sendMessage(best_link, new Message(Type.CONNECT, fragmentLevel, fragmentID, state, best_weight));    
+            check_queue();
         }
-
     }
     
     public String toString() {
-        String string =  id + " " + state + " fragmentLevel=" + fragmentLevel + " fragmentID=" + fragmentID + " best_weight=" + best_weight;
+        String string =  id + " " + state + " fragmentID=" + fragmentID + " fragmentLevel=" + fragmentLevel + " best_weight=" + best_weight;
         return string;
     }
 }
