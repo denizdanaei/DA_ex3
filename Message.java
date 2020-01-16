@@ -11,16 +11,13 @@ public class Message implements Serializable {
     int fragmentID;
     int weight;
     NodeState state;
-    int count;
-
     
-    public Message(Type type, int fragmentLevel, int fragmentID, NodeState state, int weight, int count) {
+    public Message(Type type, int fragmentLevel, int fragmentID, NodeState state, int weight) {
         this.type = type;
         this.fragmentLevel = fragmentLevel;
         this.fragmentID = fragmentID;
         this.state = state;
         this.weight = weight;
-        this.count = count;
     }
     
     public String toString() {

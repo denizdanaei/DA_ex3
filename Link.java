@@ -10,15 +10,12 @@ public class Link implements Serializable {
     NodeInterface node1, node2;
     boolean core;
     LinkState state;
-    int recieveCount;
-
     public Link(int weigth, NodeInterface node1, NodeInterface node2) {
         this.weight = weigth;
         this.node1 = node1;
         this.node2 = node2;
         this.core = false;
         this.state = LinkState.UNKOWN;
-        this.recieveCount = 0;
     }
 
     public int getWeight() {
@@ -29,14 +26,6 @@ public class Link implements Serializable {
         this.state = linkState;
     }
 
-    public void incrementCount(){
-        this.recieveCount++;
-    }
-
-    public int getCount(){
-        return recieveCount;
-    }
-    
     public NodeInterface dst(int id){
         int localID = -1;
         try {
@@ -47,8 +36,8 @@ public class Link implements Serializable {
         }
         if ( localID == id) {
             return node2;
-            } else {
-                return node1;
+        } else {
+            return node1;
         }
     }
 
