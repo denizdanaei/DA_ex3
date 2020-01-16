@@ -53,11 +53,12 @@ public class Main {
                 if (mat[i][j] != 0) createlinks(mat[i][j], nodes.get(i), nodes.get(j));
             }
         }
-
-        // Wake up nodes
+/************************
+ * WAKE UP NODES
+ **********************/
         try {
-            // for (NodeInterface n : nodes) n.wakeup();
-            nodes.get(2).wakeup();
+            for (NodeInterface n : nodes) n.wakeup();
+            // nodes.get(2).wakeup();
         } catch (Exception e) {
             System.out.println("Exception @wakeup");
             System.exit(1);
