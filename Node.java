@@ -114,7 +114,8 @@ public class Node implements NodeInterface, Runnable {
         try {
             link.dst(id).onRecieve(link.getWeight(), message);
         } catch (Exception e) {
-            System.out.println("@onSend from " + id + " l/w" + link.weight + " " + message.type);
+            System.out.println("@onSend from N" + id + " l/w" + link.weight + " " + message.type ); // + " " + link.state + " Count=" + link.getCount() + " msgCount=" + message.count
+            e.printStackTrace();
             System.exit(1);
         }
     }
@@ -218,58 +219,57 @@ public class Node implements NodeInterface, Runnable {
     }
     
     private void find_MOE(){
-        boolean localFlag = false;
+        boolean flag = false;
         for (Link link : links) {
             if(link.state == LinkState.UNKOWN){
-                if (link.getWeight() < Integer.MAX_VALUE) {
-                    localFlag = true;
+                if (link.getWeight() < best_weight) {
+                    flag = true;
                     this.test_edge = link;
                     best_weight = link.getWeight();
+                    
                 }
             }
         }
-        if(localFlag){
-            // System.out.println("N" + id + " sends test w/link" + test_edge.getWeight());
-            sendMessage(this.test_edge, new Message(Type.TEST, fragmentLevel, fragmentID, state, best_weight));
+        if(flag){
+            // System.out.println(test_edge);
+            Message m = new Message(Type.TEST, fragmentLevel, fragmentID, state, best_weight);
+            // System.out.println(m);
+            sendMessage(this.test_edge, m);
                     
         }else{
-            state = NodeState.FOUND;
             test_edge = null;
             sendReport();
-            
         }             
     }
     
     public void sendReport(){
-        // if(id == 1)  System.out.println(test_edge);
+        
+        // System.out.println(find_count);
+            
         if(find_count == 0 && test_edge == null){
             this.state = NodeState.FOUND;
             sendMessage(in_branch, new Message(Type.REPORT, fragmentLevel, fragmentID, state, best_weight));
-            // check_queue();
-        }else find_MOE();
+        }
     }
     
     public void test(Link link, Message message){
         // JUR: commented out for now, bcs it causes null pointer exception
-        
         // System.out.println("N" + id + " recieves TEST");
         if(this.fragmentLevel < message.fragmentLevel){
             queue.add(new QueueItem(link.getWeight(), message));
 
+        }else if(message.fragmentID != this.fragmentID){
+            sendMessage(link, new Message(Type.ACCEPT, this.fragmentLevel, this.fragmentID, this.state, best_weight));
         }else{
-            if(message.fragmentID != this.fragmentID){
-                sendMessage(link, new Message(Type.ACCEPT, this.fragmentLevel, this.fragmentID, this.state, best_weight));
-            }else{  
-                if(link.state == LinkState.UNKOWN){  
-                    link.setState(LinkState.NOT_IN_MST);
-                    sendMessage(link, new Message(Type.REJECT, this.fragmentLevel, this.fragmentID, this.state, best_weight));
-                }    
-                if(test_edge.weight !=link.weight){                    
-                    sendMessage(link, new Message(Type.REJECT, this.fragmentLevel, this.fragmentID, this.state, best_weight));
-                }else
-                    find_MOE(); //sure??
+            if(link.state == LinkState.UNKOWN){
+                link.setState(LinkState.NOT_IN_MST);
+                sendMessage(link, new Message(Type.REJECT, this.fragmentLevel, this.fragmentID, this.state, best_weight));
+            }else{
+                
+            // if(test_edge.weight !=link.weight) {
+                // System.out.println(test_edge);
+                find_MOE(); //sure??
             }
-
         }
     }    
     
@@ -291,7 +291,7 @@ public class Node implements NodeInterface, Runnable {
     }
 
     public void report(Link link, Message message){
-        System.out.println(this);
+        // System.out.println(this);
         // System.out.println(message);
         if(link.weight != in_branch.weight){
             if(find_count>0) find_count--;           
