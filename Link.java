@@ -37,8 +37,8 @@ public class Link implements Serializable {
         }
         if ( localID == id) {
             return node2;
-            } else {
-                return node1;
+        } else {
+            return node1;
         }
     }
 
