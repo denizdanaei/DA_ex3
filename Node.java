@@ -49,38 +49,17 @@ public class Node implements NodeInterface, Runnable {
         
         this.rxQueue = new LinkedBlockingQueue<QueueItem>();  // MESSAGE RECEIVING FIFO
     }
-
-    public void run() {
-        // System.out.println("Node " + id + " ready");
-
-        while(true) {
-            try {
-                QueueItem rx = rxQueue.poll(5, TimeUnit.SECONDS);
-                
-                if (rx==null) {
-                    System.out.println(this);
-                    continue;
-                }
-                onMessage(weightToLink(rx.linkWeight), rx.message);
-                
-            } catch (Exception e) {
-                System.out.println("N"+id+" exception at rxQueue.take()\n"+e);
-                e.printStackTrace();
-                System.exit(1);
-            }
-        }
+    
+    public int getID() {
+        return id;
     }
-
+    
     public void addLink(Link link) {
         this.links.add(link);
     }
 
     public Link getLink(int index) {
         return this.links.get(index);
-    }
-
-    public int getID() {
-        return id;
     }
 
     private void check_queue(){
@@ -102,20 +81,25 @@ public class Node implements NodeInterface, Runnable {
         return link;
     }
 
-    public void wakeup() {
-        if (state != NodeState.SLEEPING) return;
-        for (Link link : links) { 
-            if (link.getWeight() < best_weight) {
-                best_link = link;
-                best_weight = link.getWeight();
+    public void run() {
+        // System.out.println("Node " + id + " ready");
+
+        while(true) {
+            try {
+                QueueItem rx = rxQueue.poll(5, TimeUnit.SECONDS);
+                
+                if (rx==null) {
+                    System.out.println(this);
+                    continue;
+                }
+                onMessage(weightToLink(rx.linkWeight), rx.message);
+                
+            } catch (Exception e) {
+                System.out.println("N"+id+" exception at rxQueue.take()\n"+e);
+                e.printStackTrace();
+                System.exit(1);
             }
         }
-
-        best_link.setState(LinkState.IN_MST);
-        state = NodeState.FOUND;
-
-        System.out.println("Node "+id+" awake");
-        sendMessage(best_link, new Message(Type.CONNECT, this.fragmentLevel, this.fragmentID, this.state, best_weight));
     }
 
     public void sendMessage(Link link, Message message) {
@@ -144,8 +128,33 @@ public class Node implements NodeInterface, Runnable {
         // check_queue();
     }
     
+    public void wakeup() {
+        if (state != NodeState.SLEEPING) return;
+        for (Link link : links) { 
+            if (link.getWeight() < best_weight) {
+                best_link = link;
+                best_weight = link.getWeight();
+            }
+        }
+
+        best_link.setState(LinkState.IN_MST);
+        state = NodeState.FOUND;
+
+        System.out.println("Node "+id+" awake");
+        sendMessage(best_link, new Message(Type.CONNECT, this.fragmentLevel, this.fragmentID, this.state, best_weight));
+    }
+    
     public void execute(Link link, Message message) {
         switch (message.type) {
+            
+            case CONNECT:
+                connect(link, message);
+                break;
+
+            case INITIATE:
+                initiate(link, message);
+                break;
+
             case TEST:
                 test(link, message);
                 break;
@@ -158,16 +167,8 @@ public class Node implements NodeInterface, Runnable {
                 reject(link, message);
                 break;
 
-            case INITIATE:
-                initiate(link, message);
-                break;
-
             case REPORT:
                 report(link, message);
-                break;
-
-            case CONNECT:
-                connect(link, message);
                 break;
 
             case ROOT_CHANGE:
@@ -249,15 +250,6 @@ public class Node implements NodeInterface, Runnable {
             sendReport();
         }             
     }
-    public void sendReport() {
-        // System.out.println("N"+id+" find_count="+find_count);
-
-        if (find_count == 0 && test_edge == null) {
-            this.state = NodeState.FOUND;
-            check_queue();
-            sendMessage(in_branch, new Message(Type.REPORT, fragmentLevel, fragmentID, state, best_weight));
-        }
-    }
     
     public void test(Link link, Message message) {
 
@@ -295,6 +287,16 @@ public class Node implements NodeInterface, Runnable {
         check_queue();    
         }
         find_MOE();
+    }
+   
+    public void sendReport() {
+        // System.out.println("N"+id+" find_count="+find_count);
+
+        if (find_count == 0 && test_edge == null) {
+            this.state = NodeState.FOUND;
+            check_queue();
+            sendMessage(in_branch, new Message(Type.REPORT, fragmentLevel, fragmentID, state, best_weight));
+        }
     }
 
     public void report(Link link, Message message){
