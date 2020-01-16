@@ -46,7 +46,6 @@ public class Main {
                 System.exit(1);
             }
         }
-        // System.out.println();
 
         // Create links
         for (int i = 0; i < mat.length; i++) {
@@ -58,12 +57,11 @@ public class Main {
         // Wake up nodes
         try {
             // for (NodeInterface n : nodes) n.wakeup();
-            nodes.get(3).wakeup();
+            nodes.get(2).wakeup();
         } catch (Exception e) {
             System.out.println("Exception @wakeup");
             System.exit(1);
         }
-        // for (NodeInterface n : nodes) System.out.print(n);
     }
 
     private static int[][] parseGraph(String filename) throws FileNotFoundException {
