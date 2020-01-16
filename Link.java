@@ -10,7 +10,6 @@ public class Link implements Serializable {
     NodeInterface node1, node2;
     boolean core;
     LinkState state;
-
     public Link(int weigth, NodeInterface node1, NodeInterface node2) {
         this.weight = weigth;
         this.node1 = node1;
@@ -27,11 +26,11 @@ public class Link implements Serializable {
         this.state = linkState;
     }
 
-    public NodeInterface dst(int id) {
+    public NodeInterface dst(int id){
         int localID = -1;
         try {
             localID = node1.getID();
-        } catch (Exception e) {
+        }catch (Exception e) {
             System.out.println("@dst");
             System.exit(1);
         }
