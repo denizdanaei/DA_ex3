@@ -50,7 +50,7 @@ public class Node implements NodeInterface, Runnable {
     }
 
     public void run() {
-        System.out.println("Node " + id + " ready");
+        // System.out.println("Node " + id + " ready");
 
         while(true) {
             try {
@@ -173,11 +173,11 @@ public class Node implements NodeInterface, Runnable {
 
     public void connect(Link link, Message message) {
 
-        System.out.println("N" + id  +" recieved CONNECT at link "+ link.getWeight());
+        // System.out.println("N" + id  +" recieved CONNECT at link "+ link.getWeight());
 
         // ABSORB
         if (message.fragmentLevel < this.fragmentLevel) {
-            System.out.println("N" + id  +" absorb w/ link "+ link.getWeight());
+            System.out.println("N" + id  +" absorb link "+ link.getWeight());
             link.setState(LinkState.IN_MST);
             sendMessage(link, new Message(Type.INITIATE, fragmentLevel, fragmentID, state, best_weight));
             if (this.state == NodeState.FIND) find_count++;
@@ -195,7 +195,7 @@ public class Node implements NodeInterface, Runnable {
             this.state = NodeState.FIND;        // Why was this commented out?
             this.in_branch = link;
             
-            System.out.println("N" + id + " fragmentLevel= " + fragmentLevel + " fragmentID= " + fragmentID);
+            // System.out.println("N" + id + " fragmentLevel= " + fragmentLevel + " fragmentID= " + fragmentID);
             sendMessage(link, new Message( Type.INITIATE, fragmentLevel, fragmentID, NodeState.FIND, best_weight));
         }
         
@@ -203,7 +203,7 @@ public class Node implements NodeInterface, Runnable {
     
     public void initiate(Link link, Message message){
     
-        System.out.println("Node " + id + " recieved INITIATE");
+        // System.out.println("Node " + id + " recieved INITIATE");
 
         this.fragmentID = message.fragmentID;
         this.fragmentLevel = message.fragmentLevel;
@@ -211,7 +211,7 @@ public class Node implements NodeInterface, Runnable {
         this.in_branch = link;
         this.best_link = null;
         this.best_weight = Integer.MAX_VALUE;
-        System.out.println("N" + id + " fragmentLevel= " + fragmentLevel + " fragmentID= " + fragmentID);
+        // System.out.println("N" + id + " fragmentLevel= " + fragmentLevel + " fragmentID= " + fragmentID);
         // check_queue();
         for (Link l : links) {
             if (l.state == LinkState.IN_MST && l.weight != in_branch.weight) {
@@ -240,7 +240,7 @@ public class Node implements NodeInterface, Runnable {
             }
         }
         if(localFlag){
-            System.out.println("N" + id + " sends test w/link" + test_edge.getWeight());
+            // System.out.println("N" + id + " sends test w/link" + test_edge.getWeight());
             sendMessage(this.test_edge, new Message(Type.TEST, fragmentLevel, fragmentID, state, best_weight));
                     
         }else{
@@ -249,36 +249,36 @@ public class Node implements NodeInterface, Runnable {
             
         }             
     }
-    public void sendReport(){
-        if(id == 1)  System.out.println(test_edge);
-        if(find_count == 0 && test_edge == null){
+    public void sendReport() {
+        // if (id == 1)  System.out.println(test_edge);
+        if (find_count == 0 && test_edge == null) {
             this.state = NodeState.FOUND;
             sendMessage(in_branch, new Message(Type.REPORT, fragmentLevel, fragmentID, state, best_weight));
             // check_queue();
         }
     }
-    public void test(Link link, Message message){
-        // JUR: commented out for now, bcs it causes null pointer exception
+    public void test(Link link, Message message) {
         
         // System.out.println("N" + id + " recieves TEST");
-        // if(this.fragmentLevel < message.fragmentLevel){
-        //     queue.add(new QueueItem(link.getWeight(), message));
+        if(this.fragmentLevel < message.fragmentLevel) {
+            queue.add(new QueueItem(link.getWeight(), message));
 
-        // }else{
-        //     if(message.fragmentID != this.fragmentID){
-        //         sendMessage(link, new Message(Type.ACCEPT, this.fragmentLevel, this.fragmentID, this.state, best_weight));
-        //     }else{  
-        //         if(link.state == LinkState.UNKOWN){  
-        //             link.setState(LinkState.NOT_IN_MST);
-        //             sendMessage(link, new Message(Type.REJECT, this.fragmentLevel, this.fragmentID, this.state, best_weight));
-        //         }    
-        //         if(test_edge.weight !=link.weight){                    
-        //             sendMessage(link, new Message(Type.REJECT, this.fragmentLevel, this.fragmentID, this.state, best_weight));
-        //         }else
-        //             find_MOE(); //sure??
-        //     }
+        } else {
+            if (message.fragmentID != this.fragmentID) {
+                sendMessage(link, new Message(Type.ACCEPT, this.fragmentLevel, this.fragmentID, this.state, best_weight));
+            } else {  
+                if (link.state == LinkState.UNKOWN) {
+                    link.setState(LinkState.NOT_IN_MST);
+                    sendMessage(link, new Message(Type.REJECT, this.fragmentLevel, this.fragmentID, this.state, best_weight));
+                }    
+                if (test_edge.weight !=link.weight) {                    
+                    sendMessage(link, new Message(Type.REJECT, this.fragmentLevel, this.fragmentID, this.state, best_weight));
+                } else {
+                    find_MOE(); //sure??
+                }
+            }
 
-        // }
+        }
     }    
     
     public void accept(Link link, Message message){
@@ -310,8 +310,8 @@ public class Node implements NodeInterface, Runnable {
         }else{  
             if(this.state == NodeState.FIND){
                 // System.out.println("N" + id + " queued " + message.type + " w/ link" +  link.getWeight());
-                System.out.println("N" + id + " REPORT msg queued");
-                // queue.add(new QueueItem(link.getWeight(), message));
+                // System.out.println("N" + id + " REPORT msg queued");
+                queue.add(new QueueItem(link.getWeight(), message));
             }
             else{
                 System.out.println("Halt");
