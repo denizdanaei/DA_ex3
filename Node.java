@@ -191,14 +191,16 @@ public class Node implements NodeInterface, Runnable {
             if (this.state == NodeState.FIND) find_count++;
             sendMessage(link, new Message(Type.INITIATE, fragmentLevel, fragmentID, state, best_weight));        
         
-        } else if (link.state == LinkState.UNKOWN) { // ENQUEUE
+        // ENQUEUE
+        } else if (link.state == LinkState.UNKOWN) {
             queue.add(new QueueItem(link.getWeight(), message));
 
-        } else {                                      // MERGE
+        // MERGE
+        } else {
             System.out.println("N" + id  +" merge w/ link "+ link.getWeight());
             this.fragmentLevel++;
             this.fragmentID = link.getWeight();
-            this.state = NodeState.FIND;        // Why was this commented out?
+            this.state = NodeState.FIND;
             this.in_branch = link;
             sendMessage(link, new Message( Type.INITIATE, fragmentLevel, fragmentID, NodeState.FIND, best_weight));
             check_queue();
@@ -218,9 +220,10 @@ public class Node implements NodeInterface, Runnable {
         this.best_weight = Integer.MAX_VALUE;
         
         check_queue();
+
         for (Link l : links) {
-            if(l.state == LinkState.IN_MST && l.weight != in_branch.weight){
-                if(this.state == NodeState.FIND)  this.find_count++;
+            if (l.state == LinkState.IN_MST && l.weight != in_branch.weight) {
+                if (this.state == NodeState.FIND) this.find_count++;
                 sendMessage(l, new Message( Type.INITIATE, this.fragmentLevel, this.fragmentID, this.state, best_weight));                
             }
         }
@@ -230,22 +233,24 @@ public class Node implements NodeInterface, Runnable {
         }
     }
     
-    private void find_MOE(){
+    private void find_MOE() {
+
         boolean flag = false;
         for (Link link : links) {
-            if(link.state == LinkState.UNKOWN){
+            if (link.state == LinkState.UNKOWN) {
                 if (link.getWeight() < best_weight) {
                     flag = true;
                     this.test_edge = link;
-                    best_weight = link.getWeight();
-                    
+                    best_weight = link.getWeight();    
                 }
             }
         }
+
         if(flag){
             sendMessage(this.test_edge, new Message(Type.TEST, fragmentLevel, fragmentID, state, best_weight));
                     
-        }else{
+        } else {
+            // System.out.println("N"+id+" No more test edges");
             test_edge = null;
             sendReport();
         }             
@@ -299,7 +304,7 @@ public class Node implements NodeInterface, Runnable {
         }
     }
 
-    public void report(Link link, Message message){
+    public void report(Link link, Message message) {
             if(link.weight != in_branch.weight){
             if(find_count>0) find_count--;           
             if(message.weight < best_weight){
@@ -311,8 +316,7 @@ public class Node implements NodeInterface, Runnable {
             queue.add(new QueueItem(link.getWeight(), message)); 
         }else{
             if(message.weight == Integer.MAX_VALUE && best_weight == Integer.MAX_VALUE ){
-                    System.out.println("Halt");                        
-                    System.exit(1);
+                    System.out.println("N" + id + " halt");                        
             }else if(message.weight > best_weight) change_root();
         }
     }
