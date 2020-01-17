@@ -210,7 +210,7 @@ public class Node implements NodeInterface, Runnable {
     
     public void initiate(Link link, Message message){
     
-        System.out.println("Node " + id + " recieved INITIATE");
+        // System.out.println("Node " + id + " recieved INITIATE");
 
         this.fragmentID = message.fragmentID;
         this.fragmentLevel = message.fragmentLevel;
@@ -249,7 +249,7 @@ public class Node implements NodeInterface, Runnable {
         }
 
         if(flag){
-            System.out.println("N"+id+" testing on edge "+this.test_edge.weight);
+            // System.out.println("N"+id+" testing on edge "+this.test_edge.weight);
             sendMessage(this.test_edge, new Message(Type.TEST, fragmentLevel, fragmentID, state, best_weight));
                     
         } else {
@@ -306,7 +306,7 @@ public class Node implements NodeInterface, Runnable {
         // System.out.println("N"+id+" find_count="+find_count);
 
         if (find_count == 0 && test_edge == null) {
-            System.out.println("N"+id+" reporting, found nothing");
+            // System.out.println("N"+id+" reporting, found nothing");
             this.state = NodeState.FOUND;
             check_queue();
             sendMessage(in_branch, new Message(Type.REPORT, fragmentLevel, fragmentID, state, best_weight));
