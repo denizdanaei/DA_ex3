@@ -159,11 +159,11 @@ public class Node implements NodeInterface, Runnable {
                 break;
 
             case ACCEPT:
-                accept(link, message);
+                onAccept(link, message);
                 break;
         
             case REJECT:
-                reject(link, message);
+                onReject(link, message);
                 break;
 
             case REPORT:
@@ -225,35 +225,38 @@ public class Node implements NodeInterface, Runnable {
                 sendMessage(l, new Message( Type.INITIATE, this.fragmentLevel, this.fragmentID, this.state, best_weight));                
             }
         }
-        // check_queue();
 
-        // Find your own MOE
         if (this.state == NodeState.FIND) {
-            find_MOE();
+            findMoe();
         }
     }
     
-    private void find_MOE() {
-        this.best_weight = Integer.MAX_VALUE;
-        boolean flag = false;
+    // Return smallest unknown link
+    private Link findMoeCandidate() {
+        
+        int minWeight = Integer.MAX_VALUE;
+        Link candidate = null;
+        
         for (Link link : links) {
-            if (link.state == LinkState.UNKOWN) {
-                if (link.getWeight() < best_weight) {
-                    flag = true;
-                    this.test_edge = link;
-                    best_weight = link.getWeight();    
-                }
+            if (link.state == LinkState.UNKOWN && link.getWeight() < minWeight) {
+                candidate = link;
+                minWeight = link.getWeight();
             }
         }
 
-        if(flag){
-            // System.out.println("N"+id+" sending TEST to " + test_edge.getWeight());
-            sendMessage(this.test_edge, new Message(Type.TEST, fragmentLevel, fragmentID, state, best_weight));
-                    
-        } else {
-            test_edge = null;
+        return candidate;
+    }
+
+
+    private void findMoe() {
+
+        this.test_edge = findMoeCandidate();
+        if (this.test_edge == null) {
             sendReport();
-        }             
+        } else {
+            this.best_weight = this.test_edge.getWeight();
+            sendMessage(this.test_edge, new Message(Type.TEST, fragmentLevel, fragmentID, state, this.best_weight));
+        }
     }
     
     public void test(Link link, Message message) {
@@ -279,25 +282,28 @@ public class Node implements NodeInterface, Runnable {
         }
     }    
     
-    public void accept(Link link, Message message){
+    public void onAccept(Link link, Message message) {
+        System.out.println("N"+id+" received ACCEPT from " + link.getWeight());
         this.test_edge = null;
-        if(link.weight <= best_weight){
+        if (link.weight <= best_weight) {
             best_link = link;
             best_weight = link.getWeight();
         }
         sendReport();
     }  
     
-    public void reject(Link link, Message message){
-        if(link.state == LinkState.UNKOWN){
-        link.setState(LinkState.NOT_IN_MST);   
+    public void onReject(Link link, Message message) {
+        System.out.println("N"+id+" received REJECT from " + link.getWeight());
+        
+        if (link.state == LinkState.UNKOWN) {
+            link.setState(LinkState.NOT_IN_MST);   
         }
-        find_MOE();
+        findMoe();
     }
    
     public void sendReport() {
         if (find_count == 0 && test_edge == null) {
-            // System.out.println("N"+id+" reporting to " + in_branch.getWeight());
+            System.out.println("N"+id+" reporting to " + in_branch.getWeight());
             this.state = NodeState.FOUND;
             sendMessage(in_branch, new Message(Type.REPORT, fragmentLevel, fragmentID, state, best_weight));
             // check_queue();
@@ -308,7 +314,7 @@ public class Node implements NodeInterface, Runnable {
 
     public void onReport(Link link, Message message) {
         
-        // System.out.println("N"+id+" on report from "+link.getWeight());
+        System.out.println("N"+id+" on report from "+link.getWeight());
         
         // From your own subtree
         if (link.weight != in_branch.weight) {
