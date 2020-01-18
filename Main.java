@@ -58,7 +58,7 @@ public class Main {
  **********************/
         try {
             // for (NodeInterface n : nodes) n.wakeup();
-            nodes.get(0).wakeup();
+            // nodes.get(0).wakeup();
         } catch (Exception e) {
             System.out.println("Exception @wakeup");
             System.exit(1);
