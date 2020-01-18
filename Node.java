@@ -167,7 +167,7 @@ public class Node implements NodeInterface, Runnable {
                 break;
 
             case REPORT:
-                report(link, message);
+                onReport(link, message);
                 break;
 
             case ROOT_CHANGE:
@@ -300,26 +300,41 @@ public class Node implements NodeInterface, Runnable {
             // System.out.println("N"+id+" reporting to " + in_branch.getWeight());
             this.state = NodeState.FOUND;
             sendMessage(in_branch, new Message(Type.REPORT, fragmentLevel, fragmentID, state, best_weight));
-            check_queue();
+            // check_queue();
+        } else {
+            System.out.println("N"+id+" cannot report, find count= " + find_count);
         }
     }
 
-    public void report(Link link, Message message) {
+    public void onReport(Link link, Message message) {
         
         // System.out.println("N"+id+" on report from "+link.getWeight());
-        if(link.weight != in_branch.weight){
-        if(find_count>0) find_count--;           
-        if(message.weight < best_weight){
-            this.best_weight = message.weight;
-            this.best_link = link;
-        }
+        
+        // From your own subtree
+        if (link.weight != in_branch.weight) {
+            assert(find_count > 0);
+            find_count--;   
+            if (message.weight < best_weight) {
+                this.best_weight = message.weight;
+                this.best_link = link;
+            }
             sendReport();
-        }else if(this.state == NodeState.FIND){
+
+        // Other subtree -> still finding MOE
+        } else if (this.state == NodeState.FIND){
             queue.add(new QueueItem(link.getWeight(), message)); 
-        }else{
-            if(message.weight == Integer.MAX_VALUE && best_weight == Integer.MAX_VALUE ){
-                    System.out.println("N" + id + " halt");                        
-            }else if(message.weight > best_weight) change_root();
+        
+        // Other subtree -> found MOE
+        } else {
+    
+            // Your subtree has the MOE
+            if (message.weight > best_weight) {
+                change_root();
+    
+            // Other subtree has the MOE
+            } else if (message.weight == Integer.MAX_VALUE && best_weight == Integer.MAX_VALUE ) {
+                System.out.println("N" + id + " halt");                        
+            }
         }
     }
 
