@@ -204,11 +204,8 @@ public class Node implements NodeInterface, Runnable {
         // MERGE
         } else {
             //if(id==0)  System.out.println("N" + id  +" merge w/ link "+ link.getWeight());
-            this.fragmentLevel++;
-            this.fragmentID = link.getWeight();
-            this.state = NodeState.FIND;
-            this.in_branch = link;
-            sendMessage(link, new Message( Type.INITIATE, fragmentLevel, fragmentID, NodeState.FIND, best_weight));
+            
+            sendMessage(link, new Message( Type.INITIATE, fragmentLevel+1, link.getWeight(), NodeState.FIND, best_weight));
             
         }
     }
@@ -255,7 +252,7 @@ public class Node implements NodeInterface, Runnable {
     }
 
     private void findMoe() {
-        best_weight = Integer.MAX_VALUE;
+        // best_weight = Integer.MAX_VALUE;
         //if(id==0) System.out.println("Node " + id + " findMOE");
 
         this.test_edge = findMoeCandidate();
