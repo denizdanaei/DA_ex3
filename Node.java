@@ -298,7 +298,7 @@ public class Node implements NodeInterface, Runnable {
     public void onAccept(Link link, Message message) {
         //if(id==0) System.out.println("N" + id + " on ACCEPT from " + link.getWeight());
         this.test_edge = null;
-        if (link.weight <= best_weight) {
+        if (link.weight < best_weight) {
             best_link = link;
             best_weight = link.getWeight();
         }
