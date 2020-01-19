@@ -259,7 +259,7 @@ public class Node implements NodeInterface, Runnable {
         if (this.test_edge == null) {
             sendReport();
         } else {
-            this.best_weight = this.test_edge.getWeight();
+            // this.best_weight = this.test_edge.getWeight();
             //if(id==0) System.out.println("Node " + id + " send TEST l/w=" + test_edge.getWeight());
             sendMessage(this.test_edge, new Message(Type.TEST, fragmentLevel, fragmentID, state, this.best_weight));
         }
