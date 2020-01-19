@@ -154,15 +154,15 @@ public class Node implements NodeInterface, Runnable {
     public void execute(Link link, Message message) {
         switch (message.type) {
             case CONNECT:
-                connect(link, message);
+                onConnect(link, message);
                 break;
 
             case INITIATE:
-                initiate(link, message);
+                onInitiate(link, message);
                 break;
 
             case TEST:
-                test(link, message);
+                onTest(link, message);
                 break;
 
             case ACCEPT:
@@ -186,7 +186,7 @@ public class Node implements NodeInterface, Runnable {
         }
     }
 
-    public void connect(Link link, Message message) {
+    public void onConnect(Link link, Message message) {
 
         // if(id==0) System.out.println("N" + id  +" recieved CONNECT at link " + link.getWeight());
 
@@ -210,7 +210,7 @@ public class Node implements NodeInterface, Runnable {
         }
     }
     
-    public void initiate(Link link, Message message){
+    public void onInitiate(Link link, Message message){
     
         //if(id==0) System.out.println("Node " + id + " recieved INITIATE");
 
@@ -265,7 +265,7 @@ public class Node implements NodeInterface, Runnable {
         }
     }
     
-    public void test(Link link, Message message) {
+    public void onTest(Link link, Message message) {
 
         // System.out.println("N" + id + " recieves TEST");
         
@@ -284,13 +284,15 @@ public class Node implements NodeInterface, Runnable {
 
             if (link.state == LinkState.UNKOWN) {
                 link.setState(LinkState.NOT_IN_MST);
-                sendMessage(link, new Message(Type.REJECT, this.fragmentLevel, this.fragmentID, this.state, best_weight));
+                // sendMessage(link, new Message(Type.REJECT, this.fragmentLevel, this.fragmentID, this.state, best_weight));
                 //if(id==0) System.out.println("N" + id + " send REJECT to " + link.getWeight());
             }
-            if (test_edge != null && test_edge.getWeight() != link.getWeight()) {
+            if (test_edge.getWeight() != link.getWeight()) {
                 //if(id==0) System.out.println("N" + id + " send REJECT to " + link.getWeight());
                 sendMessage(link, new Message(Type.REJECT, this.fragmentLevel, this.fragmentID, this.state, best_weight));
             
+            }else{
+                findMoe();
             }
         }
     }    
