@@ -66,7 +66,7 @@ public class Node implements NodeInterface, Runnable {
         return this.links.get(index);
     }
 
-    private void check_queue(){
+    private synchronized void check_queue(){
         int size = queue.size();
     	if (size != 0){
             //if(id==0) System.out.println("N"+ id + " queue.size()="+ queue.size());
@@ -95,7 +95,8 @@ public class Node implements NodeInterface, Runnable {
                 QueueItem rx = rxQueue.poll(3, TimeUnit.SECONDS);
                 
                 if (rx==null) {
-                    System.out.println(this);
+                    // System.out.println(this);
+                    System.out.println("N" + id + " find_count=" + find_count);
                     continue;
                     
                 }
@@ -119,7 +120,7 @@ public class Node implements NodeInterface, Runnable {
         }
     }
 
-    public void onRecieve(int rxLinkWeight, Message message) {
+    public synchronized void onRecieve(int rxLinkWeight, Message message) {
         try {
             this.rxQueue.put(new QueueItem(rxLinkWeight, message));
         } catch (Exception e) {
@@ -292,7 +293,7 @@ public class Node implements NodeInterface, Runnable {
                 sendMessage(link, new Message(Type.REJECT, this.fragmentLevel, this.fragmentID, this.state, best_weight));
             
             }else{
-                findMoe();
+                // findMoe();
             }
         }
     }    
