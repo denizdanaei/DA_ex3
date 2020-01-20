@@ -16,9 +16,6 @@ Nodes are communicating by passing Message objects of various types and executin
 
 The algorithm starts by waking up at least one node (from the Main class) and finishes by printing out all the MST links.
 
-## Prerequisites
-libraries used?
-
 ## Usage
 
 ```
@@ -38,6 +35,3 @@ You can run any of the examples in the input folder or simply by creating a new 
 ## Authors
 - [Deniz Danaie](https://github.com/denizdanaie)
 - [Jure Vidmar](https://github.com/jurc192) 
-
-## Acknowledgments
-- timings?
