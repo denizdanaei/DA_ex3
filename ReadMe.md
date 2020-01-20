@@ -33,7 +33,7 @@ java Main .\inputs\graph1
 
 The result shown in the terminal will be the nodes *waking up*, getting *merged/absorbed*  followed by all the *MST links* at the end of the program.
 
-You can run any of the examples in the input folder or simply by creating a new file containing the adjacency matrix and running `javac *.java  && java Main .\<directory>\<filename>`
+You can run any of the examples in the input folder or simply by creating a new file containing the adjacency matrix in the same format and running `javac *.java  && java Main .\<directory>\<filename>`
 
 ## Authors
 - [Deniz Danaie](https://github.com/denizdanaie)
