@@ -252,7 +252,7 @@ public class Node implements NodeInterface, Runnable {
     }
 
     private void findMoe() {
-        // best_weight = Integer.MAX_VALUE;
+        best_weight = Integer.MAX_VALUE;
         //if(id==0) System.out.println("Node " + id + " findMOE");
 
         this.test_edge = findMoeCandidate();
