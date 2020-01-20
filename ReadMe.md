@@ -14,35 +14,28 @@ Nodes are communicating by passing Message objects of various types and executin
 
 The algorithm execution is started by waking up at least one Node (from the Main class) and finished by printing out all links in the MST. All the examples presented below were run by waking up all nodes immediately.
 
-## Getting Started
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
-
-### Prerequisites
-
+## Prerequisites
+libraries used?
 
 ## Usage
 
 ```
 javac *.java
 
-java Main .\inputs\graph1..7
+java Main .\inputs\graph1
 
 ```
-# TODO
-- A separated class for messages
-    - Class Node implement messages maybe?
-- Currently the algorithm works for the first step ONLY
-    - Generalize
-- Introduce dalays in threads
-    - for now ONLY delay at starting the threads
-    - later, introduce delays in messages
-- think about queues as well
 
-- sendmsg and recievemsg LN++ -> counts twice -> becuz sent at the sametime
-- best_link how to change each time what it points to
-    - stuck on the 1st value
+## Running the tests
+By using the command `javac *.java` you can compile the project and run one the examples in the `.\inputs\` folder with `java Main .\inputs\graph1` command.
 
-# Report
-- thread.start is now happening after creating the nodes and the links.
-- states has added to both link and node classes *(check if there is a better option than enum)*
-- MOE for each node is calculated *this is the 1st step*            
+The  result shown in the terminal will be the nodes *waking up*, getting *merged/absorbed* and at the end of the program the *MST links* will be printed out.
+
+You can run your own examples by creating a file containing the adjacency matrix and simply running `java Main .\<directory>\<filename>`
+
+## Authors
+- [Deniz Danaie](https://github.com/denizdanaie)
+- [Jure Vidmar](https://github.com/jurc192) 
+
+## Acknowledgments
+- timings?
