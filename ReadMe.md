@@ -32,6 +32,19 @@ The result shown in the terminal will be the nodes *waking up*, getting *merged/
 
 You can run any of the examples in the input folder or simply by creating a new file containing the adjacency matrix in the same format and running `javac *.java  && java Main .\<directory>\<filename>`
 
+## Possible Errors/Bugs
+- null pointer exception (mostly happens on if(test_edge == null) condition)
+- Node(s) stuck in the state FIND
+- best_weight may not change to MAX Integer at the end of the execution and cause the program not to halt (*we only print "halt" actually! and the core nodes print it when MST is formed.*)
+## Possible improvements
+As stated in the slide 11 of *IN4150-modeling-2019-20201*: "Make a system/model behave differently through a software layer"
+
+For graphs with more than 15 nodes, the program might not execute correctly due to the complexity of the graph.
+- Design a protocol to let the graph behave like simpler examples.
+- Run the complex graph on top of the protocol
+
+*future note for me*: For example, split the graph to smaller subgraphs and run the program (really?)
+
 ## Authors
 - [Deniz Danaie](https://github.com/denizdanaie)
 - [Jure Vidmar](https://github.com/jurc192) 
