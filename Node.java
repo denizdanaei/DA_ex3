@@ -89,10 +89,11 @@ public class Node implements NodeInterface, Runnable {
         // System.out.println("Node " + id + " ready");
         while(true) {
             try {
-                QueueItem rx = rxQueue.poll(3, TimeUnit.SECONDS);
+                QueueItem rx = rxQueue.poll(7, TimeUnit.SECONDS);
                 
                 if (rx==null) {
-                    System.out.println(in_branch);
+                    System.out.println(this);
+                    if(this.state == NodeState.FIND){findMoe();}
                     continue;
                     
                 }
